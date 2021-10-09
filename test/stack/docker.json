@@ -1,0 +1,25 @@
+{
+    "user": "ftcg",
+    "name": "docker",
+    "label": "stable",
+
+    "requires": {
+        "os": {
+            "in": [
+                "ubuntu",
+                "debian",
+                "raspbian"
+            ]
+        }
+    },
+    "steps": [
+        {
+            "executor": "sh",
+            "src": "https://get.docker.com"
+        },
+        {
+            "src": "systemctl --now enable docker",
+            "user": "root"
+        }
+    ]
+}

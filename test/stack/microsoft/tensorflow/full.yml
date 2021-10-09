@@ -1,0 +1,27 @@
+{
+    "namespace": "microsoft",
+    "name": "tensorflow",
+    "label": "latest",
+    "labels": { "version": "2.6" },
+    "requires":
+        {
+            "all":
+                [
+                    "python.version": { "semver_gt": "3.7" },
+                    "cuda.version": { "semver_gt": "11.2" },
+                ],
+        },
+    "steps":
+        [
+            {
+                "requirements":
+                    [
+                        "tensorflow",
+                        "tensorflow-datasets",
+                        "tensorflow-hub",
+                        "tensorflow-probability",
+                        "horovod[tensorflow-gpu]==0.21.3",
+                    ],
+            },
+        ],
+}

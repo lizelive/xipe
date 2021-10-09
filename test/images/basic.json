@@ -1,0 +1,15 @@
+{
+    "user": "ftcg",
+    "name": "interactive-basic",
+    "label": "stable",
+    "args": {
+        "AZUREML_VERSION": "1.34.0",
+        "USERNAME": "azureuser",
+        "PYTHON_VERSION": "3.8.12"
+    },
+    "stack":{
+        "name": "ml-basic",
+        "label" : "stable"
+    },
+    "base": "nvidia/cuda:11.4.1-cudnn8-devel-ubuntu20.04"
+}

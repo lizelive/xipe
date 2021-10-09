@@ -1,0 +1,15 @@
+{
+    "user": "azureml",
+    "name": "interactive-host",
+    "label": "stable",
+    "args": {
+        "AZUREML_VERSION": "1.34.0",
+        "USERNAME": "azureuser",
+        "PYTHON_VERSION": "3.8.12"
+    },
+    "stack":{
+        "name": "ml-basic",
+        "label" : "stable"
+    },
+    "base": "ubuntu:20.04"
+}

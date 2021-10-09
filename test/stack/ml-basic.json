@@ -1,0 +1,24 @@
+{
+    "user": "ftcg",
+    "name": "ml-basic",
+    "label": "stable",
+    "args": {
+        "AZUREML_VERSION": "1.34.0",
+        "USERNAME": "azureuser",
+        "PYTHON_VERSION": "3.8.12"
+    },
+    "requires": {
+        "python": {
+            "semver_gt": "3.7"
+        }
+    },
+    "steps": [
+        {
+            "requirement": [
+                "tensorflow~=2.6",
+                "tensorflow-datasets==4.3.0",
+                "horovod[tensorflow-gpu]==0.21.3"
+            ]
+        }
+    ]
+}

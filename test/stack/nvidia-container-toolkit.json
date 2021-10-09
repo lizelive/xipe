@@ -1,0 +1,26 @@
+{
+    "user": "ftcg",
+    "name": "docker",
+    "label": "stable",
+    "requires": {
+        "os": {
+            "in": [
+                "ubuntu",
+                "debian",
+                "raspbian"
+            ]
+        }
+    },
+    "steps": [
+        {
+            "name": "nvidia-docker",
+            "gpg_key_uri": "https://nvidia.github.io/nvidia-docker/gpgkey",
+            "sources_list_uri": "https://nvidia.github.io/nvidia-docker/$(. /etc/os-release;echo $ID$VERSION_ID)/nvidia-docker.list"
+        },
+        {
+            "packages": [
+                "nvidia-docker2"
+            ]
+        }
+    ]
+}
