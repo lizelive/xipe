@@ -3,7 +3,7 @@ use std::collections::HashMap;
 use serde::{Deserialize, Serialize};
 
 use crate::exec::Exec;
-use crate::Step;
+use crate::Operation;
 
 #[derive(Serialize, Deserialize, Debug, PartialEq, Default)]
 pub struct PipInstall {
@@ -27,7 +27,7 @@ pub struct PipInstall {
     arguments: HashMap<String, serde_yaml::Value>,
 }
 
-impl Step for PipInstall {
+impl Operation for PipInstall {
     fn steps(&self) -> Vec<Exec> {
         let mut args = Exec::new("python").args(["-m", "pip"]);
 

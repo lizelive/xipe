@@ -2,7 +2,7 @@ use std::{borrow::Cow, collections::HashMap};
 
 mod step;
 
-pub use crate::step::{Step, AnyStep};
+pub use crate::step::{Operation, AnyStep};
 
 
 

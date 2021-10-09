@@ -2,7 +2,7 @@ use std::{collections::HashMap, path::Path, string};
 
 use crate::exec::Exec;
 
-use super::{Step};
+use super::{Operation};
 use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug, PartialEq)]
@@ -49,7 +49,7 @@ pub struct ExecuateSource {
     pub cwd: Option<String>,
 }
 
-impl Step for ExecuateSource {
+impl Operation for ExecuateSource {
     fn steps(&self) ->Vec<Exec> {
         let exec = self.interpreter.as_exec().arg("-c").arg(self.command);
         vec![exec]

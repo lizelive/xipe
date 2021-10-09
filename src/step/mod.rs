@@ -17,7 +17,7 @@ use self::run::*;
 use self::comment::*;
 
 #[enum_dispatch]
-pub trait Step {
+pub trait Operation {
     fn apply_to_dockerfile(&self, dockerfile: DockerfileBuilder) -> DockerfileBuilder{
         let steps = self.steps().into_iter();
         let shell_steps: Vec<_> = steps.map(Exec::to_shell).collect();

@@ -1,7 +1,7 @@
 use serde::{Deserialize, Serialize};
 
 use crate::exec::Exec;
-use crate::step::Step;
+use crate::step::Operation;
 
 #[derive(Serialize, Deserialize, Debug, PartialEq)]
 pub struct AptInstall {
@@ -10,7 +10,7 @@ pub struct AptInstall {
     keep_cache: bool,
 }
 
-impl Step for AptInstall {
+impl Operation for AptInstall {
     fn steps(&self) -> Vec<Exec> {
         let mut cmds = Vec::new();
         if self.update {
