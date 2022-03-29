@@ -2,7 +2,7 @@ use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 use thiserror::Error;
 
-#[derive(Serialize, Deserialize, Debug, PartialEq)]
+#[derive(Serialize, schemars::JsonSchema, Deserialize, Debug, PartialEq)]
 pub struct Exec {
     pub program: String,
 
@@ -66,20 +66,22 @@ impl<T> From<Option<T>> for ExecuteError {
 }
 
 impl Exec {
-    pub fn env(self, name: impl ToString, value: impl ToString) -> Self {
+    pub fn env(mut self, name: impl ToString, value: impl ToString) -> Self {
         self.env.insert(name.to_string(), Some(value.to_string()));
         self
     }
 
-    pub fn arg(self, arg: impl ToString) -> Self {
+    pub fn arg(mut self, arg: impl ToString) -> Self {
         self.args.push(arg.to_string());
         self
     }
 
     pub fn args<S: ToString>(self, args: impl IntoIterator<Item = S>) -> Self {
-        self.args
-            .append(args.into_iter().map(|x| x.to_string()).collect());
-        self
+        let mut this = self;
+        for arg in args {
+            this = this.arg(arg);
+        }
+        this
     }
 
     pub fn with_env(
@@ -99,40 +101,37 @@ impl Exec {
     }
 
     pub fn to_shell(&self) -> String {
-        let program = Vec::new();
+        let mut program = String::new();
 
         if self.cwd.is_some() || self.ignore_environment || !self.env.is_empty() {
-            program.push("env");
+            program += "env";
 
             if self.ignore_environment {
-                program.push("--ignore-environment");
+                program += " --ignore-environment";
             }
 
             if let Some(cwd) = &self.cwd {
-                program.push(&format!("--chdir={}", shlex::quote(cwd)))
+                program+=&format!(" --chdir={}", shlex::quote(cwd));
             }
 
             for (k, v) in &self.env {
                 if let Some(v) = v {
                     let v = shlex::quote(v);
-                    program.push(&format!("{}={}", k, v))
+                    program+=&format!(" {}={}", k, v)
                 } else {
-                    program.push(&format!("--unset={}", k))
+                    program+= &format!(" --unset={}", k);
                 }
             }
         }
 
-        program.push(&self.program);
+        program += &self.program;
 
-        // for arg in &self.args {
-        //     program.push(arg)
-        // }
+        for arg in &self.args {
+            program += " ";
+            program += &shlex::quote(arg);
+        }
 
-        let args_quoted = self.args.iter().map(|arg| shlex::quote(arg).as_ref());
-
-        let program = program.into_iter().chain(args_quoted);
-
-        shlex::join(program)
+        program
     }
 
     pub fn parse(in_str: &str) -> Option<Self> {
@@ -142,13 +141,17 @@ impl Exec {
     }
 
     pub fn execute(&self) -> Result<String, ExecuteError> {
-        let command = Command::new(self.program).args(self.args);
+        
+        let mut command = Command::new(&self.program);
+        command.args(&self.args);
         let out = command.output()?;
         if out.status.success() {
             let str = String::from_utf8(out.stdout)?;
             Ok(str)
         } else {
-            Err(out)
+            let str = String::from_utf8(out.stderr)?;
+            Ok(str)
+            //Err(out.into())
         }
     }
 

@@ -4,9 +4,9 @@ use crate::exec::Exec;
 
 use super::{Step};
 use dockerfile::{Add, DockerfileBuilder, Run};
-use serde::{Deserialize, Serialize};
+use serde::{Deserialize, Serialize, schemars::JsonSchema};
 
-#[derive(Serialize, Deserialize, Debug, PartialEq)]
+#[derive(Serialize, schemars::JsonSchema, Deserialize, Debug, PartialEq)]
 pub struct Block {
     pub steps: Vec<Exec>,
     pub cleanup: Vec<Exec>,

@@ -1,4 +1,4 @@
-#[derive(Serialize, Deserialize, Debug, PartialEq)]
+#[derive(Serialize, schemars::JsonSchema, Deserialize, Debug, PartialEq)]
 struct StepIf {
     test: String,
     if_true: Vec<AnyStep>,

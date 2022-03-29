@@ -1,0 +1,21 @@
+{
+    "$schema": "../schema.json",
+    "stacks": [
+        {
+            "namespace": "micrsoft",
+            "base": "help",
+            "stack": {
+            }
+        }
+    ],
+    "images": [
+        {
+            "namespace": "microsoft",
+            "label": "latest",
+            "name": "interactive-basic",
+            "args": {
+                "python.version" : "3.1.8"
+            }
+        }
+    ]
+}

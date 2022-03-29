@@ -5,7 +5,7 @@ use crate::exec::Exec;
 use crate::Operation;
 use dockerfile::{Add, DockerfileBuilder, Run};
 use serde::{Deserialize, Serialize};
-#[derive(Serialize, Deserialize, Debug, PartialEq)]
+#[derive(Serialize, schemars::JsonSchema, Deserialize, Debug, PartialEq)]
 pub struct Download {
     pub url: String,
     pub dest: String,

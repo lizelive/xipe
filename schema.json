@@ -1,0 +1,662 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Repo",
+  "type": "object",
+  "required": [
+    "images",
+    "stacks"
+  ],
+  "properties": {
+    "images": {
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/Image"
+      }
+    },
+    "stacks": {
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/Stack"
+      }
+    }
+  },
+  "definitions": {
+    "AnyOperation": {
+      "anyOf": [
+        {
+          "$ref": "#/definitions/AptRepoAdd"
+        },
+        {
+          "$ref": "#/definitions/AptInstall"
+        },
+        {
+          "$ref": "#/definitions/PipInstall"
+        },
+        {
+          "$ref": "#/definitions/Run"
+        },
+        {
+          "$ref": "#/definitions/Comment"
+        }
+      ]
+    },
+    "AptInstall": {
+      "type": "object",
+      "required": [
+        "keep_cache",
+        "packages",
+        "update"
+      ],
+      "properties": {
+        "keep_cache": {
+          "type": "boolean"
+        },
+        "packages": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "update": {
+          "type": "boolean"
+        }
+      }
+    },
+    "AptRepoAdd": {
+      "type": "object",
+      "required": [
+        "name",
+        "sources_list"
+      ],
+      "properties": {
+        "gpg_key": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "name": {
+          "type": "string"
+        },
+        "sources_list": {
+          "type": "string"
+        }
+      }
+    },
+    "Argument": {
+      "type": "object",
+      "required": [
+        "default",
+        "name"
+      ],
+      "properties": {
+        "default": {
+          "$ref": "#/definitions/Value"
+        },
+        "description": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "kind": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "name": {
+          "type": "string"
+        },
+        "values": {
+          "type": [
+            "array",
+            "null"
+          ],
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "Base": {
+      "anyOf": [
+        {
+          "$ref": "#/definitions/DockerImageRef"
+        },
+        {
+          "$ref": "#/definitions/ThingRef"
+        }
+      ]
+    },
+    "Comment": {
+      "type": "object",
+      "required": [
+        "comment"
+      ],
+      "properties": {
+        "comment": {
+          "type": "string"
+        }
+      }
+    },
+    "Comparison": {
+      "type": "string",
+      "enum": [
+        "eq",
+        "ne",
+        "gt",
+        "lt",
+        "ge",
+        "le",
+        "in",
+        "is"
+      ]
+    },
+    "DockerImageRef": {
+      "type": "object",
+      "required": [
+        "name"
+      ],
+      "properties": {
+        "digest": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "name": {
+          "type": "string"
+        },
+        "registry": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "tag": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      }
+    },
+    "Image": {
+      "type": "object",
+      "required": [
+        "base",
+        "label",
+        "name",
+        "namespace",
+        "stack"
+      ],
+      "properties": {
+        "args": {
+          "type": [
+            "object",
+            "null"
+          ],
+          "additionalProperties": {
+            "$ref": "#/definitions/Value"
+          }
+        },
+        "base": {
+          "description": "dockerfile that is the base of this image",
+          "allOf": [
+            {
+              "$ref": "#/definitions/Base"
+            }
+          ]
+        },
+        "label": {
+          "type": "string"
+        },
+        "mixins": {
+          "description": "what mixins to bake for this stack",
+          "default": [],
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/ThingRef"
+          }
+        },
+        "name": {
+          "type": "string"
+        },
+        "namespace": {
+          "type": "string"
+        },
+        "stack": {
+          "description": "The stack to use",
+          "allOf": [
+            {
+              "$ref": "#/definitions/ThingRefArg"
+            }
+          ]
+        }
+      }
+    },
+    "Interpreter": {
+      "description": "Which interperter to use for executing a script https://en.wikipedia.org/wiki/Interpreter_directive",
+      "oneOf": [
+        {
+          "type": "string",
+          "enum": [
+            "BourneShell",
+            "Bash",
+            "PowerShell"
+          ]
+        },
+        {
+          "description": "using the env program search path to find it",
+          "type": "object",
+          "required": [
+            "Env"
+          ],
+          "properties": {
+            "Env": {
+              "type": "string"
+            }
+          },
+          "additionalProperties": false
+        }
+      ]
+    },
+    "Licence": {
+      "oneOf": [
+        {
+          "type": "string",
+          "enum": [
+            "Unlicensed"
+          ]
+        },
+        {
+          "type": "object",
+          "required": [
+            "Spdx"
+          ],
+          "properties": {
+            "Spdx": {
+              "type": "string"
+            }
+          },
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "required": [
+            "Url"
+          ],
+          "properties": {
+            "Url": {
+              "type": "string"
+            }
+          },
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "required": [
+            "Custom"
+          ],
+          "properties": {
+            "Custom": {
+              "type": "string"
+            }
+          },
+          "additionalProperties": false
+        }
+      ]
+    },
+    "PipInstall": {
+      "type": "object",
+      "required": [
+        "requirements"
+      ],
+      "properties": {
+        "arguments": {
+          "default": {},
+          "type": "object",
+          "additionalProperties": {
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        },
+        "extra_index_urls": {
+          "default": [],
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "find_links": {
+          "default": [],
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "keep_cache": {
+          "default": false,
+          "type": "boolean"
+        },
+        "requirements": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "upgrade": {
+          "default": false,
+          "type": "boolean"
+        },
+        "user": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      }
+    },
+    "Requirements": {
+      "anyOf": [
+        {
+          "type": "array",
+          "items": [
+            {
+              "type": "string"
+            },
+            {
+              "$ref": "#/definitions/Comparison"
+            },
+            {
+              "$ref": "#/definitions/Value"
+            }
+          ],
+          "maxItems": 3,
+          "minItems": 3
+        },
+        {
+          "type": "object",
+          "required": [
+            "none"
+          ],
+          "properties": {
+            "none": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/Requirements"
+              }
+            }
+          }
+        },
+        {
+          "type": "object",
+          "required": [
+            "all"
+          ],
+          "properties": {
+            "all": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/Requirements"
+              }
+            }
+          }
+        },
+        {
+          "type": "object",
+          "required": [
+            "any"
+          ],
+          "properties": {
+            "any": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/Requirements"
+              }
+            }
+          }
+        }
+      ]
+    },
+    "Run": {
+      "type": "object",
+      "required": [
+        "src"
+      ],
+      "properties": {
+        "args": {
+          "description": "the interperter this script is for",
+          "default": [],
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "cwd": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "env": {
+          "type": "object",
+          "additionalProperties": {
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        },
+        "ignore_environment": {
+          "default": false,
+          "type": "boolean"
+        },
+        "interperter": {
+          "anyOf": [
+            {
+              "$ref": "#/definitions/Interpreter"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "src": {
+          "$ref": "#/definitions/Source"
+        }
+      }
+    },
+    "Source": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "string"
+        },
+        {
+          "type": "string"
+        }
+      ]
+    },
+    "Stack": {
+      "type": "object",
+      "required": [
+        "label",
+        "name",
+        "namespace",
+        "requirements",
+        "steps"
+      ],
+      "properties": {
+        "args": {
+          "default": [],
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Argument"
+          }
+        },
+        "author": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "description": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "label": {
+          "type": "string"
+        },
+        "labels": {
+          "default": {},
+          "type": "object",
+          "additionalProperties": {
+            "$ref": "#/definitions/Value"
+          }
+        },
+        "license": {
+          "anyOf": [
+            {
+              "$ref": "#/definitions/Licence"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "maintainer": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "mixins": {
+          "description": "what mixins this stack depends on",
+          "default": [],
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/ThingRef"
+          }
+        },
+        "name": {
+          "type": "string"
+        },
+        "namespace": {
+          "type": "string"
+        },
+        "requirements": {
+          "$ref": "#/definitions/Requirements"
+        },
+        "steps": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/AnyOperation"
+          }
+        }
+      }
+    },
+    "ThingRef": {
+      "type": "object",
+      "required": [
+        "label",
+        "name",
+        "namespace"
+      ],
+      "properties": {
+        "label": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "namespace": {
+          "type": "string"
+        }
+      }
+    },
+    "ThingRefArg": {
+      "type": "object",
+      "required": [
+        "label",
+        "name",
+        "namespace"
+      ],
+      "properties": {
+        "args": {
+          "type": [
+            "object",
+            "null"
+          ],
+          "additionalProperties": {
+            "$ref": "#/definitions/Value"
+          }
+        },
+        "label": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "namespace": {
+          "type": "string"
+        }
+      }
+    },
+    "Value": {
+      "anyOf": [
+        {
+          "description": "Represents a YAML null value.",
+          "type": "null"
+        },
+        {
+          "type": "array",
+          "items": [
+            {
+              "type": "string"
+            },
+            {
+              "$ref": "#/definitions/Value"
+            }
+          ],
+          "maxItems": 2,
+          "minItems": 2
+        },
+        {
+          "description": "Represents a YAML boolean.",
+          "type": "boolean"
+        },
+        {
+          "description": "Represents a YAML numerical value, whether integer or floating point.",
+          "type": "integer",
+          "format": "int"
+        },
+        {
+          "description": "Represents a YAML string.",
+          "type": "string"
+        },
+        {
+          "description": "Represents a YAML sequence in which the elements are `serde_yaml::Value`.",
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Value"
+          }
+        },
+        {
+          "description": "Represents a YAML mapping in which the keys and values are both `serde_yaml::Value`.",
+          "type": "object",
+          "additionalProperties": {
+            "$ref": "#/definitions/Value"
+          }
+        }
+      ]
+    }
+  }
+}

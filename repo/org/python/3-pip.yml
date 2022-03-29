@@ -1,0 +1,8 @@
+for:
+  os_release:
+    id_like: debian
+requires:
+  - org.python.3
+apt:
+  install:
+    - python3-pip

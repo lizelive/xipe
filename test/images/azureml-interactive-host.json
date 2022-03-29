@@ -1,5 +1,5 @@
 {
-    "user": "azureml",
+    "namespace": "azureml",
     "name": "interactive-host",
     "label": "stable",
     "args": {
@@ -7,9 +7,13 @@
         "USERNAME": "azureuser",
         "PYTHON_VERSION": "3.8.12"
     },
-    "stack":{
+    "stack": {
+        "namespace": "azureml",
         "name": "ml-basic",
-        "label" : "stable"
+        "label": "stable"
     },
-    "base": "ubuntu:20.04"
+    "base": {
+        "name": "ubuntu",
+        "tag": "20.04"
+    }
 }

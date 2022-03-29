@@ -1,0 +1,24 @@
+---
+for:
+  os_release:
+    id_like: debian
+apt:
+  gpg:
+    - https://download.docker.com/linux/{{os_release.id}}/gpg
+  sources:
+    docker: "deb [arch={{os_release.arch}} signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/{{os_release.id}}"
+  install:
+    - docker-ce
+    - docker-ce-cli
+    - containerd.io
+---
+for:
+  os_release:
+    id_like: fedora
+apt:
+  repo:
+    - https://download.docker.com/linux/{{os_release.id}}/docker-ce.repo
+  install:
+    - docker-ce
+    - docker-ce-cli
+    - containerd.io

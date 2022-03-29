@@ -1,0 +1,89 @@
+{
+    "steps":[
+        "literal",
+        "tokenize",
+        "parse"
+    ],
+    "literals": [
+        {
+            "head": "String",
+            "regex" : "\"((?:[^\"\\\\]|\\\\(?:r|v|t|b|f|n|\"|0|\\\\|(?:x[0-9a-fA-F]{2})|(?:x[0-9a-fA-F]{2})|(?:u\\{[0-9a-fA-F]{1,6}\\})|(?:u[0-9a-fA-F]{4})))*)\""
+        },
+        {
+            "head": "Number",
+            "regex" : "(-?(?:0|[1-9]\\d*)(?:\\.\\d+)?(?:[eE][+-]?\\d+)?)"
+        },
+        {
+            "head": "Symbol",
+            "regex": "([A-Za-z]\\w*)"
+        }
+    ],
+    "operators": [
+{"precedence":1,"id":"Identity", "form": ["(", null, ")"]},
+{"precedence":1,"id":"Part", "form": ["[[", null, "]]"]},
+{"precedence":1,"id":"List", "form": ["[", null, "]"]},
+{"precedence":1,"id":"Function", "form": ["|", null, "|", null]},
+{"precedence":1,"id":"Call", "form": [null, null]},
+{"precedence":1,"id":"Rule", "binop": "->"},
+{"precedence":1,"id":"Dot", "form": [null, ".", null]},
+{"precedence":1,"id":"Scope", "form": [null, "::", null]},
+{"precedence":2,"id":"Not", "form": ["!", null]},
+{"precedence":2,"id":"BitNot", "form": ["~", null]},
+{"precedence":2,"id":"Neg", "form": ["-", null]},
+{"precedence":2,"id":"Plus", "form": ["+", null]},
+{"precedence":2,"id":"Deref", "form": ["*", null]},
+{"precedence":2,"id":"Borrow", "form": ["&", null]},
+{"precedence":2,"id":"PreIncrement", "form": ["++", null]},
+{"precedence":2,"id":"PreDecrement", "form": ["--", null]},
+{"precedence":3,"id":"Mul", "form": [null, "*", null]},
+{"precedence":3,"id":"Div", "form": [null, "/", null]},
+{"precedence":3,"id":"Rem", "form": [null, "%", null]},
+{"precedence":4,"id":"Add", "form": [null, "+", null]},
+{"precedence":4,"id":"Sub", "form": [null, "-", null]},
+{"precedence":5,"id":"Shl", "form": [null, "<<", null]},
+{"precedence":5,"id":"Shr", "form": [null, ">>", null]},
+{"precedence":6,"id":"Lt", "form": [null, "<", null]},
+{"precedence":6,"id":"Le", "form": [null, "<=", null]},
+{"precedence":6,"id":"Gt", "form": [null, ">", null]},
+{"precedence":6,"id":"Ge", "form": [null, ">=", null]},
+{"precedence":7,"id":"Eq", "form": [null, "==", null]},
+{"precedence":7,"id":"Ne", "form": [null, "!=", null]},
+{"precedence":8,"id":"BitAnd", "form": [null, "&", null]},
+{"precedence":9,"id":"BitXor", "form": [null, "^", null]},
+{"precedence":9,"id":"Pow", "form": [null, "**", null]},
+{"precedence":10,"id":"BitOr", "form": [null, "|", null]},
+{"precedence":11,"id":"And", "form": [null, "&&", null]},
+{"precedence":12,"id":"Or", "form": [null, "||", null]},
+{"precedence":14,"id":"Assign", "form": [null, "=", null]},
+{"precedence":14,"id":"RemAssign", "form": [null, "%=", null]},
+{"precedence":14,"id":"AddAssign", "form": [null, "+=", null]},
+{"precedence":14,"id":"MulAssign", "form": [null, "*=", null]},
+{"precedence":14,"id":"SubAssign", "form": [null, "-=", null]},
+{"precedence":14,"id":"DivAssign", "form": [null, "/=", null]},
+{"precedence":14,"id":"ShlAssign", "form": [null, "<<=", null]},
+{"precedence":14,"id":"ShrAssign", "form": [null, ">>=", null]},
+{"precedence":14,"id":"BitAndAssign", "form": [null, "&=", null]},
+{"precedence":14,"id":"BitOrAssign", "form": [null, "|=", null]},
+{"precedence":14,"id":"BitXorAssign", "form": [null, "^=", null]},
+{"precedence":15,"id":"Sequence", "form": [null, ",", null]},
+{"precedence":99,"id":"Compound", "form": [null, ";", null]},
+
+
+{"precedence":0,"id":"Block", "form": ["{", null, "}"]},
+{"precedence":0,"id":"In", "form": [null, "in", null]},
+{"precedence":0,"id":"Else", "form": [null, "else", null]},
+{"precedence":0,"id":"Label", "form": [null, ":", null]},
+{"precedence":0,"id":"Let", "form": ["let", null]},
+{"precedence":0,"id":"If", "form": ["if", null, null]},
+
+
+{"precedence":null,"id":"For", "form": ["for", null, "in", null, null]},
+{"precedence":0,"id":"Bind", "form": [null, "@", null]},
+{"precedence":0,"id":"Try", "form": [null, "?" ]},
+{"precedence":0,"id":"While", "form": ["while", null ]},
+{"precedence":0,"id":"Branch", "form": [null, "=>", null]},
+{"precedence":0,"id":"Range", "form": [null, "..", null]},
+{"precedence":0,"id":"Blank", "form": ["_"]},
+{"precedence":0,"id":"Nothing", "form": ["()"]}
+]
+}

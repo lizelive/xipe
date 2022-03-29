@@ -1,0 +1,5 @@
+requires:
+  - org.python.3
+pip:
+  install:
+    - jupyterlab

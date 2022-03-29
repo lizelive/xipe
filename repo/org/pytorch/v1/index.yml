@@ -1,0 +1,4 @@
+first:
+  - alias: org.pytorch.v1.cu113
+  - alias: org.pytorch.v1.cu102
+  - alias: org.pytorch.v1.cpu

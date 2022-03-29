@@ -1,0 +1,43 @@
+# https://gitlab.com/nvidia/container-images/cuda/blob/master/doc/supported-tags.md
+---
+tags:
+  - tag: 11.3.1-cudnn8-runtime-ubuntu20.04
+    flavor: runtime
+    cuda: { "major": 11, "minor": 3, "patch": 1 }
+    cudann: 8
+    os-release:
+      id: ubuntu
+      id_like:
+        - debian
+      version_id: "20.04"
+      version_codename: focal
+  - tag: 11.3.1-runtime-ubuntu20.04
+    flavor: runtime
+    cuda:
+      major: 11
+      minor: 3
+      patch: 1
+    os-release:
+      id: ubuntu
+      id_like:
+        - debian
+      version_id: "20.04"
+      version_codename: focal
+---
+{{#tags}}
+---
+id: com.nvidia.cuda.cu{{cuda.major}}{{cuda.minor}}.{{os-release.id}}.{{os-release.version_codename}}
+base: nvcr.io/nvidia/cuda:{{tag}}
+has:
+  os-release:
+    id: {{os-release.id}}
+    id_like: {{os-release.id_like}}
+    version_id: {{os-release.version_id}}
+    version_codename: {{os-release.version_codename}}
+  cuda:
+    major: {{cuda.major}}
+    minor: {{cuda.minor}}
+  {{#cudann}}
+  cudann: {{cudann}}
+  {{/cudann}}
+{{/tags}}

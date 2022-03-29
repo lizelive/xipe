@@ -1,0 +1,15 @@
+---
+for:
+  os_release:
+    id_like: debian
+requires:
+  - com.docker.get
+apt:
+  key:
+    - https://nvidia.github.io/libnvidia-container/gpgkey
+  sources:
+    nvidia-container-toolkit: https://nvidia.github.io/libnvidia-container/{{os_release.id}}{{os_release.version_id}}/libnvidia-container.list
+  install:
+    - nvidia-docker2
+test:
+  - run: docker run --rm --gpus all nvidia/cuda:11.0-base nvidia-smi

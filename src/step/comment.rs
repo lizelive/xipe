@@ -6,7 +6,7 @@ use super::{Operation};
 use dockerfile::{Add, DockerfileBuilder, Run};
 use serde::{Deserialize, Serialize};
 
-#[derive(Serialize, Deserialize, Debug, PartialEq)]
+#[derive(Serialize, schemars::JsonSchema, Deserialize, Debug, PartialEq)]
 pub struct Comment {
     pub comment: String,
 }
@@ -14,7 +14,7 @@ pub struct Comment {
 impl Operation for Comment {
     fn steps(&self) ->Vec<Exec> {
         vec![
-            Exec::new("echo").arg(self.comment)
+            Exec::new("echo").arg(&self.comment)
         ]
     }
 }

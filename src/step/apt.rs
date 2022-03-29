@@ -3,7 +3,7 @@ use serde::{Deserialize, Serialize};
 use crate::exec::Exec;
 use crate::step::Operation;
 
-#[derive(Serialize, Deserialize, Debug, PartialEq)]
+#[derive(Serialize, schemars::JsonSchema, Deserialize, Debug, PartialEq)]
 pub struct AptInstall {
     update: bool,
     packages: Vec<String>,
@@ -28,7 +28,7 @@ impl Operation for AptInstall {
     }
 }
 
-#[derive(Serialize, Deserialize, Debug, PartialEq)]
+#[derive(Serialize, schemars::JsonSchema, Deserialize, Debug, PartialEq)]
 pub struct AptRepoAdd {
     name: String,
     sources_list: String,

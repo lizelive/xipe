@@ -1,0 +1,6 @@
+for:
+  os_release:
+    id_like: debian
+apt:
+  install:
+    - python3

@@ -1,18 +1,19 @@
-use std::{collections::HashMap, path::Path, string};
+use std::{collections::HashMap, path::Path};
 
 use crate::exec::Exec;
 
 use super::{Operation};
 use serde::{Deserialize, Serialize};
 
-#[derive(Serialize, Deserialize, Debug, PartialEq)]
+#[derive(Serialize, schemars::JsonSchema, Deserialize, Debug, PartialEq)]
+#[serde(untagged)]
 pub enum Source {
     Url(String),
-    File(Path),
+    File(Box<Path>),
     Text(String),
 }
 
-#[derive(Serialize, Deserialize, Debug, PartialEq)]
+#[derive(Serialize, schemars::JsonSchema, Deserialize, Debug, PartialEq)]
 pub struct Run {
     /// the interperter this script is for
     #[serde(default)]
@@ -51,7 +52,7 @@ pub struct ExecuateSource {
 
 impl Operation for ExecuateSource {
     fn steps(&self) ->Vec<Exec> {
-        let exec = self.interpreter.as_exec().arg("-c").arg(self.command);
+        let exec = self.interpreter.as_exec().arg("-c").arg(&self.command);
         vec![exec]
     }
 }
@@ -59,8 +60,8 @@ impl Operation for ExecuateSource {
 
 /// Which interperter to use for executing a script
 /// https://en.wikipedia.org/wiki/Interpreter_directive
-#[derive(Serialize, Deserialize, Debug, PartialEq)]
-enum Interpreter {
+#[derive(Serialize, schemars::JsonSchema, Deserialize, Debug, PartialEq)]
+pub enum Interpreter {
     ///Execute the file using the Bourne shell, or a compatible shell, assumed to be in the /bin directory
     BourneShell,
 

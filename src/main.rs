@@ -1,24 +1,27 @@
+use std::fs::File;
+use std::io::Write;
 use std::{borrow::Cow, collections::HashMap};
 
 mod step;
 
-pub use crate::step::{Operation, AnyStep};
-
-
+pub use crate::step::{AnyOperation, Operation};
 
 use serde::{Deserialize, Serialize};
-use serde_yaml::Value;
 
 mod ast;
-
 mod exec;
+mod stack;
+
+use crate::stack::*;
+
+use crate::ast::Value;
 
 #[macro_use]
 extern crate enum_dispatch;
 
 use anyhow::anyhow;
 
-#[derive(Serialize, Deserialize, Debug, PartialEq)]
+#[derive(Serialize, schemars::JsonSchema, Deserialize, Debug, PartialEq)]
 enum DockerCommand {
     Run { command: String },
     Label(String, String),
@@ -27,7 +30,7 @@ enum DockerCommand {
     From(String),
 }
 
-#[derive(Serialize, Deserialize, Debug, PartialEq)]
+#[derive(Serialize, schemars::JsonSchema, Deserialize, Debug, PartialEq)]
 struct Argument {
     name: String,
     default: Value,
@@ -39,14 +42,14 @@ struct Argument {
     kind: Option<String>,
 }
 
-#[derive(Serialize, Deserialize, Debug, PartialEq)]
+#[derive(Serialize, schemars::JsonSchema, Deserialize, Debug, PartialEq)]
 struct ThingIdentifier {
     namespace: String,
     name: String,
     label: String,
 }
 
-#[derive(Serialize, Deserialize, Debug, PartialEq)]
+#[derive(Serialize, schemars::JsonSchema, Deserialize, Debug, PartialEq)]
 #[serde(untagged)]
 enum Requirements {
     Compare(String, Comparison, Value),
@@ -55,7 +58,7 @@ enum Requirements {
     Any { any: Vec<Requirements> },
 }
 
-#[derive(Serialize, Deserialize, Debug, PartialEq)]
+#[derive(Serialize, schemars::JsonSchema, Deserialize, Debug, PartialEq)]
 #[serde(rename_all = "snake_case")]
 enum Comparison {
     Eq,
@@ -88,133 +91,118 @@ impl Comparison {
             Comparison::Le => Ok(value.le(other)),
 
             Comparison::In => match other {
-                _ => Err(anyhow!{"can't be in {:?}", other}),
                 Value::String(other) => {
                     let value_str = coerce_to_string(value);
                     Ok(other.contains(&value_str))
                 }
                 Value::Sequence(seq) => Ok(seq.contains(value)),
-                Value::Mapping(map) => Ok(map.contains_key(value)),
+                //Value::Mapping(map) => Ok(map.contains_key(value)),
+                _ => Err(anyhow! {"can't be in {:?}", other}),
             },
-            Comparison::Is => {
-                match (value, other) {
-                    (Value::Number(_), Value::String(_)) => todo!(),
-                    (Value::String(_), Value::Number(_)) => todo!(),
-                    (Value::String(value), Value::String(other)) => {
-                        let value = semver::Version::parse(value)?;
-                        let other = semver::VersionReq::parse(other)?;
-                        Ok(true)
-                    },
-                    _ => Err(anyhow!{"{:?} can't be {:?}", value, other})
+            Comparison::Is => match (value, other) {
+                (Value::Number(_), Value::String(_)) => todo!(),
+                (Value::String(_), Value::Number(_)) => todo!(),
+                (Value::String(value), Value::String(other)) => {
+                    let value = semver::Version::parse(value)?;
+                    let other = semver::VersionReq::parse(other)?;
+                    Ok(other.matches(&value))
                 }
+                _ => Err(anyhow! {"{:?} can't be {:?}", value, other}),
             },
         }
     }
 }
 
-#[derive(Serialize, Deserialize, Debug, PartialEq)]
+#[derive(Serialize, schemars::JsonSchema, Deserialize, Debug, PartialEq)]
 struct ThingRef {
     #[serde(flatten)]
     id: ThingIdentifier,
 }
 
-#[derive(Serialize, Deserialize, Debug, PartialEq)]
+#[derive(Serialize, schemars::JsonSchema, Deserialize, Debug, PartialEq)]
 struct ThingRefArg {
+    #[serde(flatten)]
     id: ThingRef,
     args: Option<HashMap<String, Value>>,
 }
 
-#[derive(Serialize, Deserialize, Debug, PartialEq)]
+#[derive(Serialize, schemars::JsonSchema, Deserialize, Debug, PartialEq)]
+pub enum Licence {
+    Unlicensed,
+    Spdx(String),
+    Url(String),
+    Custom(String),
+}
+
+#[derive(Serialize, schemars::JsonSchema, Deserialize, Debug, PartialEq)]
 struct PackageInfo {
     #[serde(flatten)]
     id: ThingIdentifier,
 
-    license: Option<String>,
+    license: Option<Licence>,
     description: Option<String>,
+
+    author: Option<String>,
     maintainer: Option<String>,
 
     #[serde(default)]
     labels: HashMap<String, Value>,
 }
 
-#[derive(Serialize, Deserialize, Debug, PartialEq)]
-struct User {
-    username: String,
-    gid: i32,
-    uid: i32,
+// #[derive(Serialize, schemars::JsonSchema, Deserialize, Debug, PartialEq)]
+// enum DigestOrTag {
+//     Tag(String),
+//     Digest(String),
+// }
+
+#[derive(Serialize, schemars::JsonSchema, Deserialize, Debug, PartialEq)]
+struct DockerImageRef {
+    registry: Option<String>,
+    name: String,
+    digest: Option<String>,
+    tag: Option<String>,
 }
 
-#[derive(Serialize, Deserialize, Debug, PartialEq)]
-struct StepCreateUser {
-    username: String,
-    gid: i32,
-    uid: i32,
-}
-
-#[derive(Serialize, Deserialize, Debug, PartialEq)]
-struct StepAddon {
-    #[serde(flatten)]
-    id: ThingRefArg,
-}
-
-
-#[derive(Serialize, Deserialize, Debug, PartialEq)]
-struct StepEnvironment {
-    env: Vec<(String, String)>,
-    save: bool,
-}
-
-#[derive(Serialize, Deserialize, Debug, PartialEq)]
+#[derive(Serialize, schemars::JsonSchema, Deserialize, Debug, PartialEq)]
 #[serde(untagged)]
 enum Base {
-    Any,
-    Docker(String),
+    Docker(DockerImageRef),
     Image(ThingRef),
 }
 
-#[derive(Serialize, Deserialize, Debug, PartialEq)]
-struct Stack {
+#[derive(Debug, PartialEq, Serialize, schemars::JsonSchema, Deserialize)]
+struct Image {
     #[serde(flatten)]
-    meta: PackageInfo,
+    id: ThingRefArg,
+    /// dockerfile that is the base of this image
+    base: Base,
 
-    steps: Vec<AnyStep>,
-
-    requirements: Requirements,
-
-    #[serde(default)]
-    args: Vec<Argument>,
-
-    // what mixins are required for this stack
-    #[serde(default)]
-    mixins: Vec<ThingRef>,
-}
-
-impl Stack {
-    fn can_go_on(&self, _base: &Base) -> bool {
-        todo!()
-    }
-}
-
-#[derive(Debug, PartialEq, Serialize, Deserialize)]
-struct BakeImage {
-    // docker image that is the base of this image
-    base: String,
-
-    // The stack to use
+    /// The stack to use
     stack: ThingRefArg,
 
-    // what mixins to bake for this stack
+    /// what mixins to bake for this stack
     #[serde(default)]
     mixins: Vec<ThingRef>,
 }
 
-#[derive(Debug, PartialEq, Serialize, Deserialize)]
+#[derive(Debug, PartialEq, Serialize, schemars::JsonSchema, Deserialize)]
 struct Repo {
-    stacks: Vec<BakeImage>,
-    addons: Vec<Stack>,
+    images: Vec<Image>,
+    stacks: Vec<Stack>,
 }
 
-fn main() {
+fn main() -> anyhow::Result<()> {
+    let schema = schemars::schema_for!(Repo);
+    let schema_string = serde_json::to_string_pretty(&schema).unwrap();
+    //println!("{}", schema_string);
+    let mut output = File::create("schema.json")?;
+    output.write_all(schema_string.as_bytes())?;
+    //write!(output, "{}", schema_string);
+
+    let cool = include_str!("../test/images/azureml-interactive-host.json");
+    let image: Image = serde_yaml::from_str(cool)?;
+    println!("{:?}", image);
+    Ok(())
     // let data = FullStack {
     //     id: ThingIdentifier {
     //         name: "hello".to_string(),
