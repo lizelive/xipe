@@ -1,0 +1,8 @@
+{{range $.tags}}---
+id: com.nvidia.cuda.cu{{.cuda.major}}{{.cuda.minor}}.{{.flavor}}{{ if .cudnn }}.cudnn{{.cudnn.major}}{{end}}.{{.os.id}}.{{.os.version_codename}}
+from: nvcr.io/nvidia/cuda:{{.tag}}
+has:
+  os: {{.os | toJSON }}
+  cuda: {{.cuda | toJSON }}{{if .cudnn }}
+  cudnn: {{.cudnn | toJSON }}{{end}}
+{{end}}

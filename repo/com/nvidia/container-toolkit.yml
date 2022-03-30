@@ -1,6 +1,6 @@
 ---
 for:
-  os_release:
+  os:
     id_like: debian
 requires:
   - com.docker.get
@@ -8,7 +8,7 @@ apt:
   key:
     - https://nvidia.github.io/libnvidia-container/gpgkey
   sources:
-    nvidia-container-toolkit: https://nvidia.github.io/libnvidia-container/{{os_release.id}}{{os_release.version_id}}/libnvidia-container.list
+    nvidia-container-toolkit: https://nvidia.github.io/libnvidia-container/{{os.id}}{{os.version_id}}/libnvidia-container.list
   install:
     - nvidia-docker2
 test:
