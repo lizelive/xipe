@@ -1,0 +1,10 @@
+requires:
+  - com.ubuntu.jammy
+apt:
+  install:
+    - nvidia-cudnn
+    - python3-pip
+    - python3-torch
+    - python3-sklearn
+    - python3-sklearn-pandas
+    - r-base

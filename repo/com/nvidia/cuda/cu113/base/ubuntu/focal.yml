@@ -1,0 +1,12 @@
+from: nvcr.io/nvidia/cuda:11.3.1-base-ubuntu20.04
+has:
+  os:
+    id: ubuntu
+    id_like:
+    - debian
+    version_codename: focal
+    version_id: '20.04'
+  cuda:
+    major: 11
+    minor: 5
+    patch: 1
