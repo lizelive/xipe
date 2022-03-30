@@ -14,7 +14,7 @@
     "steps": [
         {
             "name": "docker",
-            "sources_list": "deb [arch=$(dpkg --print-architecture)] https://download.docker.com/linux/$(. /etc/os-release;echo $ID) $(lsb_release -cs) stable",
+            "sources_list": "deb [arch=$(dpkg --print-architecture)] https://download.docker.com/linux/$(. /etc/os_release;echo $ID) $(lsb_release -cs) stable",
             "gpg_key": "https://download.docker.com/linux/ubuntu/gpg"
         },
         {

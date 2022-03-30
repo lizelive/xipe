@@ -15,7 +15,7 @@
         {
             "name": "nvidia-docker",
             "gpg_key_uri": "https://nvidia.github.io/nvidia-docker/gpgkey",
-            "sources_list_uri": "https://nvidia.github.io/nvidia-docker/$(. /etc/os-release;echo $ID$VERSION_ID)/nvidia-docker.list"
+            "sources_list_uri": "https://nvidia.github.io/nvidia-docker/$(. /etc/os_release;echo $ID$VERSION_ID)/nvidia-docker.list"
         },
         {
             "packages": [
