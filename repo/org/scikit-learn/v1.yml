@@ -1,5 +1,5 @@
 requires:
-  - org.python.3
+  - org.python.v3
 pip:
   install:
     - scikit-learn==1

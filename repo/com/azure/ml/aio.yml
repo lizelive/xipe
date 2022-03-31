@@ -1,5 +1,8 @@
 requires:
-  - com.ubuntu.jammy
+  - org.python.v3
+  - org.pytorch.v1
+  - org.tensorflow.v2
+  - org.scikit-learn.v1
 apt:
   install:
     - nvidia-cudnn

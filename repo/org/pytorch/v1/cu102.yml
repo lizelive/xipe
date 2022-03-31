@@ -3,7 +3,7 @@ for:
     major: 10
     minor: 2
 requires:
-  - org.python.3
+  - org.python.v3
 pip:
   extra-index-url:
     - https://download.pytorch.org/whl/cu102

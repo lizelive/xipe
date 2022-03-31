@@ -3,7 +3,7 @@ for:
     pip: '>= 19.0'
     python: '>=3.7,<=3.10'
 requires:
-  - org.python.3
+  - org.python.v3
 pip:
   install:
     - tf-nightly

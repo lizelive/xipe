@@ -15,6 +15,7 @@ RUN if [ "${NODE_VERSION}" != "none" ]; then su vscode -c "umask 0002 && . /usr/
 # [Optional] Uncomment the next lines to use go get to install anything else you need
 USER vscode
 RUN go install github.com/hairyhenderson/gomplate/v3/cmd/gomplate@latest
+RUN go install github.com/moby/buildkit/cmd/buildctl
 # RUN go get -x <your-dependency-or-tool>
 
 # [Optional] Uncomment this line to install global node packages.

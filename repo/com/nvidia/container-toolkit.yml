@@ -10,6 +10,30 @@ apt:
   sources:
     nvidia-container-toolkit: https://nvidia.github.io/libnvidia-container/{{os.id}}{{os.version_id}}/libnvidia-container.list
   install:
-    - nvidia-docker2
+    - nvidia-container-toolkit
+add:
+  # add hook if missing
+  - path: /usr/share/containers/oci/hooks.d/oci-nvidia-hook.json
+    json:
+      version: 1.0.0
+      hook:
+        path: "/usr/bin/nvidia-container-toolkit"
+        args:
+        - nvidia-container-toolkit
+        - prestart
+        env:
+        - PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+      when:
+        always: true
+        commands:
+        - ".*"
+      stages:
+      - prestart
+    conflict: skip
+  # allow rootless
+  - path: /etc/nvidia-container-runtime/config.toml
+    toml:
+      no-cgroups: true
+    conflict: merge
 test:
   - run: docker run --rm --gpus all nvidia/cuda:11.0-base nvidia-smi

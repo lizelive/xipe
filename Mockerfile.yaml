@@ -1,0 +1,13 @@
+#syntax=r2d4/mocker
+#example https://raw.githubusercontent.com/r2d4/mockerfile/master/Mockerfile.yaml
+apiVersion: v1alpha1
+images:
+- name: ml
+  from: ubuntu:jammy
+  package:
+    install:
+    - ca-certificates
+    - podman-docker
+    - python3-pip
+    - ubuntu-standard
+    - ubuntu-server
