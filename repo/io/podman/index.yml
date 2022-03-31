@@ -1,0 +1,23 @@
+first:
+  - for:
+      os:
+        id: ubuntu
+        version_codename:
+          in:
+            - hirsute
+            - impish
+            - jammy
+    apt:
+      install:
+        - podman
+  - for:
+      os:
+        id: ubuntu
+    apt:
+      sources:
+        devel:kubic:libcontainers:stable:
+          - deb https://download.opensuse.org/repositories/devel:/kubic:/libcontainers:/stable/xUbuntu_{{.os.version_id}}/ /
+      keys:
+        - https://download.opensuse.org/repositories/devel:kubic:libcontainers:stable/xUbuntu_{{.os.version_id}}/Release.key        
+      install:
+        - podman

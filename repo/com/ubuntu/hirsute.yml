@@ -1,3 +1,3 @@
-from: ubuntu:hirsute
+from: docker.io/library/ubuntu:hirsute
 has:
   os: { id: ubuntu, id_like: [ debian ], version_id: '21.04', version_codename: hirsute }

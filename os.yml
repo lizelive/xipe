@@ -1,0 +1,8 @@
+{
+  "os": {
+    "id": "$ID",
+    "version": "$VERSION_ID",
+    "like": "$ID $ID_LIKE",
+    "codename": "$VERSION_CODENAME"
+  }
+}

@@ -1,0 +1,9 @@
+{
+  "os": {
+    "id": "ubuntu",
+    "version": "20.04",
+    "like": "ubuntu debian",
+    "codename": "focal"
+  }
+}
+
