@@ -1,0 +1,92 @@
+# https://www.flatcar.org/docs/latest/provisioning/config-transpiler/configuration/
+systemd:
+  units:
+    # systemd-delta --type=extended
+    - name: nginx.service
+      enabled: true
+      contents: |
+        [Unit]
+        Description=NGINX example
+        After=docker.service
+        Requires=docker.service
+        [Service]
+        TimeoutStartSec=0
+        ExecStartPre=-/usr/bin/docker rm --force nginx1
+        ExecStart=/usr/bin/docker run --name nginx1 --pull always --net host docker.io/nginx:1
+        ExecStop=/usr/bin/docker stop nginx1
+        Restart=always
+        RestartSec=5s
+        [Install]
+        WantedBy=multi-user.target
+      # setup a file with brtfs
+    - name: format-var-lib-docker.service
+      contents: |
+        [Unit]
+        Before=docker.service var-lib-docker.mount
+        RequiresMountsFor=/var/lib
+        ConditionPathExists=!/var/lib/docker.btrfs
+        [Service]
+        Type=oneshot
+        ExecStart=/usr/bin/truncate --size=25G /var/lib/docker.btrfs
+        ExecStart=/usr/sbin/mkfs.btrfs /var/lib/docker.btrfs        
+    - name: var-lib-docker.mount
+      enabled: true
+      contents: |
+        [Unit]
+        Before=docker.service
+        After=format-var-lib-docker.service
+        Requires=format-var-lib-docker.service
+        [Mount]
+        What=/var/lib/docker.btrfs
+        Where=/var/lib/docker
+        Type=btrfs
+        Options=loop,discard
+        [Install]
+        RequiredBy=docker.service    
+    # mount the ephemeral drive
+    - name: media-ephemeral.mount
+      enabled: true
+      contents: |
+        [Unit]
+        Before=local-fs.target
+        [Mount]
+        What=/dev/sda1
+        Where=/media/ephemeral
+        Type=ext4
+        [Install]
+        WantedBy=local-fs.target
+passwd:
+  users:
+    - name: lizelive
+      ssh_authorized_keys:
+        - "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIO7mJeN8oU9Opvq7PdBUb+ygAeeThnsjb+557S6pqZhf"
+      groups: [ sudo, docker ]
+storage:
+  filesystems:
+    - name: media-ephemeral
+      mount:
+        device: /dev/sda1
+        format: ext4
+        wipe_filesystem: true
+    # make a brtfs docker
+    # - name: var-lib-docker
+    #   mount:
+    #     device: /dev/sdc
+    #     format: btrfs
+    #     wipe_filesystem: true
+  files:
+    # /usr/share/oem/bin/oem-postinst
+    - path: forklift.sh
+      contents:
+        remote:
+          url: https://raw.githubusercontent.com/mediadepot/flatcar-forklift/master/forklift.sh
+    - path: /etc/modules-load.d/nf.conf
+      filesystem: root
+      mode: 0644
+      contents:
+        inline: |
+          loop
+          i2c_core
+          ipmi_msghandler
+update:
+  group: stable

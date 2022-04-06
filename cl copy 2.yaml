@@ -1,0 +1,87 @@
+# docker use log journald or 
+
+# https://www.flatcar.org/docs/latest/provisioning/config-transpiler/configuration/
+systemd:
+  units:
+    # systemd-delta --type=extended
+    # enable the gateway to allow browsing systemd logs
+    # by default on 0.0.0.0:19531
+    - name: systemd-journal-gatewayd.socket
+      enabled: true
+    - name: nginx.service
+      enabled: true
+      contents: |
+        [Unit]
+        Description=NGINX example
+        After=docker.service
+        Requires=docker.service
+        [Service]
+        TimeoutStartSec=0
+        ExecStartPre=-/usr/bin/docker rm --force nginx1
+        ExecStart=/usr/bin/docker run --log-driver none --name nginx1 --pull always --net host docker.io/nginx:1
+        ExecStop=/usr/bin/docker stop nginx1
+        Restart=always
+        RestartSec=5s
+        [Install]
+        WantedBy=multi-user.target
+      # setup a file with brtfs
+    - name: format-var-lib-docker.service
+      contents: |
+        [Unit]
+        Before=docker.service var-lib-docker.mount
+        RequiresMountsFor=/var/lib
+        ConditionPathExists=!/var/lib/docker.btrfs
+        [Service]
+        Type=oneshot
+        ExecStart=/usr/bin/truncate --size=25G /var/lib/docker.btrfs
+        ExecStart=/usr/sbin/mkfs.btrfs /var/lib/docker.btrfs        
+    - name: var-lib-docker.mount
+      enabled: true
+      contents: |
+        [Unit]
+        Before=docker.service
+        After=format-var-lib-docker.service
+        Requires=format-var-lib-docker.service
+        [Mount]
+        What=/var/lib/docker.btrfs
+        Where=/var/lib/docker
+        Type=btrfs
+        Options=loop,discard
+        [Install]
+        RequiredBy=docker.service    
+passwd:
+  # adds user and their ssh key
+  users:
+    - name: lizelive
+      ssh_authorized_keys:
+        - "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIO7mJeN8oU9Opvq7PdBUb+ygAeeThnsjb+557S6pqZhf"
+      groups: [ sudo, docker ]
+    
+# the last disk is the emphemral disk and is mounted to
+# /mnt/resource by default
+# the second to last disk is the os disk
+# sda is first data disk sdb is second data disk
+
+# ls /dev/disk/by-partlabel/
+# BIOS-BOOT  EFI-SYSTEM  OEM  OEM-CONFIG  ROOT  USR-A  USR-B
+# [1:0:0:0]
+storage:
+  filesystems:
+    - name: var-lib-docker
+      mount:
+        device: /dev/disk/by-partlabel/USR-A
+        format: btrfs
+    - name: mnt-data
+      mount:
+        device: /dev/disk/by-partlabel/USR-B
+        format: ext4
+# update:
+#   group: stable
+
+
+# docker run --rm -v /run/systemd/journal/socket:/run/systemd/journal/socket --network=host -it ubuntu:20.04 bash
+# apt update && apt install systemd-journal-remote
+# /lib/systemd/systemd-journal-remote --listen-http=0.0.0.0:8888
+
+
+# docker run -d --log-driver journald --name ipfs_host -v ipfs_data:/data/ipfs -p 4001:4001 -p 127.0.0.1:8080:8080 -p 127.0.0.1:5001:5001 ipfs/go-ipfs:latest

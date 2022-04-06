@@ -1,0 +1,1 @@
+docker run --runtime nvidia --rm nvcr.io/nvidia/cuda:11.6.0-base-ubuntu20.04  nvidia-smi

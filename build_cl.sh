@@ -1,0 +1,1 @@
+cat cl.yaml | docker run --rm -i ghcr.io/flatcar-linux/ct:latest -platform azure | jq

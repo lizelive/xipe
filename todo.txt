@@ -25,3 +25,5 @@ zinc (50mg or 200mg)
 
 right now:
 eeg please send full results
+
+https://docs.microsoft.com/en-us/azure/virtual-machines/linux/instance-metadata-service?tabs=linux#get-user-data
